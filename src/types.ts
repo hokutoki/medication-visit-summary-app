@@ -1,4 +1,4 @@
-export type Condition = "good" | "normal" | "bad";
+export type Condition = 1 | 2 | 3 | 4 | 5;
 
 export type TimeSlot = "wakeConcerta" | "morning" | "lunch" | "evening" | "bedtime";
 
@@ -45,6 +45,7 @@ export type DoctorSummary = {
   period: VisitPeriod | null;
   medicationAdherence: number | null;
   averageActivityScore: number | null;
+  averageConditionScore: number | null;
   lowActivityDays: number;
   badConditionDays: number;
   memoDays: number;

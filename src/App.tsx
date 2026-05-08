@@ -17,18 +17,12 @@ import {
   getVisitPeriod
 } from "./analytics";
 import { addDays, daysBetween, formatJapaneseDate, formatShortDate, todayString } from "./dateUtils";
-import { createDailyRecord, createEmptyAppData, TIME_SLOTS } from "./defaults";
+import { CONDITION_OPTIONS, createDailyRecord, createEmptyAppData, TIME_SLOTS } from "./defaults";
 import { loadAppData, normalizeAppData, saveAppData } from "./storage";
-import type { AppData, Condition, DailyRecord, VisitCycle } from "./types";
+import type { AppData, DailyRecord, VisitCycle } from "./types";
 
 type TabKey = "today" | "period" | "visit" | "settings";
 type SaveState = "読み込み中" | "保存済み" | "保存中" | "保存エラー";
-
-const CONDITION_OPTIONS: Array<{ id: Condition; label: string; detail: string }> = [
-  { id: "good", label: "良い", detail: "比較的安定" },
-  { id: "normal", label: "普通", detail: "いつも通り" },
-  { id: "bad", label: "悪い", detail: "つらさあり" }
-];
 
 const TABS: Array<{ id: TabKey; label: string }> = [
   { id: "today", label: "今日" },
@@ -153,6 +147,7 @@ function App() {
       return {
         date,
         label: formatShortDate(date),
+        conditionScore: record?.condition ?? null,
         activityScore: record?.activityScore ?? null
       };
     });
@@ -295,18 +290,19 @@ function TodayTab({
       <section className="card">
         <div className="section-heading">
           <h2>今日の体調</h2>
-          <p>色だけでなく文字でも状態が分かるようにしています。</p>
+          <p>1 = かなり悪い / 3 = 普通 / 5 = かなり良い</p>
         </div>
-        <div className="segmented" role="group" aria-label="今日の体調">
+        <div className="score-grid condition-score-grid" role="group" aria-label="今日の体調">
           {CONDITION_OPTIONS.map((option) => (
             <button
               key={option.id}
               type="button"
-              className={record.condition === option.id ? "segment active" : "segment"}
+              className={record.condition === option.id ? "score-button active" : "score-button"}
               aria-pressed={record.condition === option.id}
+              aria-label={`体調 ${option.id}、${option.detail}`}
               onClick={() => updateRecord((previous) => ({ ...previous, condition: option.id }))}
             >
-              <strong>{option.label}</strong>
+              {option.label}
               <span>{option.detail}</span>
             </button>
           ))}
@@ -375,7 +371,11 @@ function PeriodTab({
       value: formatNullableNumber(summary.averageActivityScore, "/10", 1, "記録なし"),
       detail: `3以下 ${summary.lowActivityDays}日`
     },
-    { label: "体調「悪い」", value: `${summary.badConditionDays}日`, detail: "本人入力ベース" },
+    {
+      label: "平均体調",
+      value: formatNullableNumber(summary.averageConditionScore, "/5", 1, "記録なし"),
+      detail: `2以下 ${summary.badConditionDays}日`
+    },
     { label: "メモあり", value: `${summary.memoDays}日`, detail: "相談候補の目印" }
   ];
 
@@ -415,6 +415,14 @@ function PeriodTab({
         domain={[0, 10]}
         suffix="/10"
         color="#2563eb"
+      />
+      <ChartCard
+        title="体調の推移"
+        data={chartData}
+        dataKey="conditionScore"
+        domain={[1, 5]}
+        suffix="/5"
+        color="#f97316"
       />
     </div>
   );
@@ -530,7 +538,11 @@ function VisitTab({
                 <dd>{summary.lowActivityDays}日</dd>
               </div>
               <div>
-                <dt>体調「悪い」</dt>
+                <dt>平均体調</dt>
+                <dd>{formatNullableNumber(summary.averageConditionScore, "/5", 1, "記録なし")}</dd>
+              </div>
+              <div>
+                <dt>体調 2以下</dt>
                 <dd>{summary.badConditionDays}日</dd>
               </div>
               <div>

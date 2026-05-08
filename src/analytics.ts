@@ -1,5 +1,5 @@
 import { addDays, listDatesInclusive } from "./dateUtils";
-import { TIME_SLOTS } from "./defaults";
+import { getConditionLabel, TIME_SLOTS } from "./defaults";
 import type { DailyRecord, DoctorSummary, NotableDay, VisitCycle, VisitPeriod } from "./types";
 
 export const getVisitPeriod = (visitCycle: VisitCycle): VisitPeriod | null => {
@@ -52,7 +52,7 @@ export const countLowActivityDays = (records: DailyRecord[]): number =>
   records.filter((record) => record.activityScore !== null && record.activityScore <= 3).length;
 
 export const countBadConditionDays = (records: DailyRecord[]): number =>
-  records.filter((record) => record.condition === "bad").length;
+  records.filter((record) => record.condition <= 2).length;
 
 export const getNotableDays = (records: DailyRecord[]): NotableDay[] =>
   records
@@ -61,7 +61,7 @@ export const getNotableDays = (records: DailyRecord[]): NotableDay[] =>
       if (record.activityScore !== null && record.activityScore <= 3) {
         reasons.push(`やる気・動ける度 ${record.activityScore}`);
       }
-      if (record.condition === "bad") reasons.push("体調「悪い」");
+      if (record.condition <= 2) reasons.push(`体調 ${record.condition}/5（${getConditionLabel(record.condition)}）`);
       if (record.medications.some((medication) => !medication.taken)) reasons.push("服薬忘れあり");
       if (record.memo.trim()) reasons.push("メモあり");
       return { date: record.date, reasons, record };
@@ -80,6 +80,7 @@ export const buildDoctorSummary = (
     period,
     medicationAdherence: calculateMedicationAdherence(periodRecords),
     averageActivityScore: averageIgnoringNull(periodRecords.map((record) => record.activityScore)),
+    averageConditionScore: averageIgnoringNull(periodRecords.map((record) => record.condition)),
     lowActivityDays: countLowActivityDays(periodRecords),
     badConditionDays: countBadConditionDays(periodRecords),
     memoDays: periodRecords.filter((record) => record.memo.trim()).length,

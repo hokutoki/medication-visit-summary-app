@@ -323,6 +323,9 @@ textarea:focus-visible {
 }
 
 .score-button {
+  display: grid;
+  place-items: center;
+  gap: 2px;
   border-radius: 13px;
   background: #f8fafc;
   color: #0f172a;
@@ -331,10 +334,25 @@ textarea:focus-visible {
   box-shadow: inset 0 0 0 2px #cbd5e1;
 }
 
+.score-button span {
+  color: #475569;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
 .score-button.active {
   background: #2563eb;
   color: #ffffff;
   box-shadow: inset 0 0 0 2px #1d4ed8;
+}
+
+.score-button.active span {
+  color: #ffffff;
+}
+
+.condition-score-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .field,
@@ -680,6 +698,10 @@ textarea {
 
   .score-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .condition-score-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .summary-list div {

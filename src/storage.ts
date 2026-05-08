@@ -1,5 +1,5 @@
 import { createDailyRecord, createDefaultMedications, createEmptyAppData, TIME_SLOTS } from "./defaults";
-import type { AppData, DailyRecord, MedicationLog, TimeSlot } from "./types";
+import type { AppData, Condition, DailyRecord, MedicationLog, TimeSlot } from "./types";
 
 const DB_NAME = "medication-visit-summary";
 const STORE_NAME = "app";
@@ -68,9 +68,21 @@ const normalizeMedicationLogs = (logs: unknown): MedicationLog[] => {
   });
 };
 
+const normalizeCondition = (condition: unknown): Condition => {
+  if (condition === "bad") return 2;
+  if (condition === "normal") return 3;
+  if (condition === "good") return 4;
+
+  const numberValue = Number(condition);
+  if (Number.isInteger(numberValue) && numberValue >= 1 && numberValue <= 5) {
+    return numberValue as Condition;
+  }
+  return 3;
+};
+
 export const normalizeDailyRecord = (record: unknown): DailyRecord | null => {
   if (typeof record !== "object" || record === null) return null;
-  const raw = record as Partial<DailyRecord>;
+  const raw = record as Partial<DailyRecord> & { condition?: unknown };
   if (typeof raw.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date)) return null;
   const normalizedActivityScore = normalizeNumberOrNull(raw.activityScore);
 
@@ -78,7 +90,7 @@ export const normalizeDailyRecord = (record: unknown): DailyRecord | null => {
   return {
     ...base,
     medications: normalizeMedicationLogs(raw.medications),
-    condition: raw.condition === "good" || raw.condition === "bad" ? raw.condition : "normal",
+    condition: normalizeCondition(raw.condition),
     activityScore:
       normalizedActivityScore === null ? null : Math.max(0, Math.min(10, normalizedActivityScore)),
     memo: typeof raw.memo === "string" ? raw.memo : "",

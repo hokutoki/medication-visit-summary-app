@@ -30,16 +30,6 @@ export const calculateDailyMedicationAdherence = (record: DailyRecord): number |
   return (taken / total) * 100;
 };
 
-export const calculateMedicationAdherence = (records: DailyRecord[]): number | null => {
-  const total = records.reduce((sum, record) => sum + record.medications.length, 0);
-  if (total === 0) return null;
-  const taken = records.reduce(
-    (sum, record) => sum + record.medications.filter((medication) => medication.taken).length,
-    0
-  );
-  return (taken / total) * 100;
-};
-
 export const averageIgnoringNull = (values: Array<number | null | undefined>): number | null => {
   const validValues = values.filter(
     (value): value is number => value !== null && value !== undefined && Number.isFinite(value)
@@ -78,7 +68,6 @@ export const buildDoctorSummary = (
 
   return {
     period,
-    medicationAdherence: calculateMedicationAdherence(periodRecords),
     averageActivityScore: averageIgnoringNull(periodRecords.map((record) => record.activityScore)),
     averageConditionScore: averageIgnoringNull(periodRecords.map((record) => record.condition)),
     lowActivityDays: countLowActivityDays(periodRecords),

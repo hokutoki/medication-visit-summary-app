@@ -45,7 +45,6 @@ export type NotableDay = {
 
 export type DoctorSummary = {
   period: VisitPeriod | null;
-  medicationAdherence: number | null;
   averageActivityScore: number | null;
   averageConditionScore: number | null;
   lowActivityDays: number;

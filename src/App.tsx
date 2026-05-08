@@ -526,10 +526,6 @@ function VisitTab({
                 <dd>{formatPeriod(visitCycle)}</dd>
               </div>
               <div>
-                <dt>服薬達成率</dt>
-                <dd>{formatPercent(summary.medicationAdherence)}</dd>
-              </div>
-              <div>
                 <dt>平均やる気・動ける度</dt>
                 <dd>{formatNullableNumber(summary.averageActivityScore, "/5", 1, "記録なし")}</dd>
               </div>

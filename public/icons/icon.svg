@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="服薬と受診">
+  <rect width="512" height="512" rx="112" fill="#f8fbff" />
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="#ffffff" stroke="#2563eb" stroke-width="22" />
+  <rect x="96" y="110" width="320" height="292" rx="48" fill="#dbeafe" />
+  <path d="M160 186h192" stroke="#0f766e" stroke-width="28" stroke-linecap="round" />
+  <path d="M256 122v128" stroke="#2563eb" stroke-width="28" stroke-linecap="round" />
+  <circle cx="190" cy="306" r="34" fill="#0284c7" />
+  <rect x="240" y="279" width="92" height="54" rx="27" fill="#7c3aed" />
+  <path d="M120 396c38-38 78-57 120-57 58 0 92 44 152 16" fill="none" stroke="#f97316" stroke-width="18" stroke-linecap="round" />
+</svg>

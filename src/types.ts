@@ -8,19 +8,11 @@ export type MedicationLog = {
   takenAt?: string | null;
 };
 
-export type HealthMetrics = {
-  sleepHours?: number | null;
-  restingHeartRate?: number | null;
-  averageHeartRate?: number | null;
-  steps?: number | null;
-};
-
 export type DailyRecord = {
   date: string;
   medications: MedicationLog[];
   condition: Condition;
   activityScore: number | null;
-  health: HealthMetrics;
   memo: string;
   updatedAt: string;
 };
@@ -55,10 +47,6 @@ export type DoctorSummary = {
   averageActivityScore: number | null;
   lowActivityDays: number;
   badConditionDays: number;
-  averageSleepHours: number | null;
-  shortSleepDays: number;
-  averageRestingHeartRate: number | null;
-  averageSteps: number | null;
   memoDays: number;
   notableDays: NotableDay[];
   visitMemo: string;

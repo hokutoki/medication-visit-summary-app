@@ -3,7 +3,7 @@
 ## Project Goal
 
 This project is an iPhone-friendly PWA for medication tracking and doctor-visit summaries.
-It helps the user summarize medication adherence, daily condition, activity/motivation score, sleep, heart rate, steps, and next visit date over a 4-week visit cycle.
+It helps the user summarize medication adherence, daily condition, activity/motivation score, memos, and next visit date over a 4-week visit cycle.
 
 ## Important Medical Safety Rule
 
@@ -11,12 +11,12 @@ This app must never claim to diagnose, treat, or determine medical decisions.
 Always present summaries as reference information for doctor visits.
 Display clear disclaimers in the UI.
 
-## Measurement Data Rule
+## Sensor Data Rule
 
 This is a web app.
 Do not add automatic sensor integrations to the PWA.
-Sleep, heart rate, and step data are manual-entry fields in this app.
-Keep related UI simple and avoid implying automatic data retrieval.
+Do not add sensor-derived tracking unless the user explicitly asks for those fields again.
+Keep the daily record focused so the input burden stays low.
 
 ## UX Rules
 
@@ -31,7 +31,7 @@ Keep related UI simple and avoid implying automatic data retrieval.
 ## Data Rules
 
 - Missing values must be null
-- Never treat missing health data as 0
+- Never treat missing scores or records as 0
 - Averages must ignore null values
 - Export/import data as JSON
 - Keep data local by default

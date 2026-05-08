@@ -20,12 +20,6 @@ export const createDailyRecord = (date: string): DailyRecord => ({
   medications: createDefaultMedications(),
   condition: "normal",
   activityScore: null,
-  health: {
-    sleepHours: null,
-    restingHeartRate: null,
-    averageHeartRate: null,
-    steps: null
-  },
   memo: "",
   updatedAt: new Date().toISOString()
 });

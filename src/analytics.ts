@@ -54,11 +54,6 @@ export const countLowActivityDays = (records: DailyRecord[]): number =>
 export const countBadConditionDays = (records: DailyRecord[]): number =>
   records.filter((record) => record.condition === "bad").length;
 
-export const countShortSleepDays = (records: DailyRecord[]): number =>
-  records.filter(
-    (record) => record.health.sleepHours !== null && record.health.sleepHours !== undefined && record.health.sleepHours < 6
-  ).length;
-
 export const getNotableDays = (records: DailyRecord[]): NotableDay[] =>
   records
     .map((record) => {
@@ -67,9 +62,6 @@ export const getNotableDays = (records: DailyRecord[]): NotableDay[] =>
         reasons.push(`やる気・動ける度 ${record.activityScore}`);
       }
       if (record.condition === "bad") reasons.push("体調「悪い」");
-      if (record.health.sleepHours !== null && record.health.sleepHours !== undefined && record.health.sleepHours < 6) {
-        reasons.push(`睡眠 ${record.health.sleepHours}時間`);
-      }
       if (record.medications.some((medication) => !medication.taken)) reasons.push("服薬忘れあり");
       if (record.memo.trim()) reasons.push("メモあり");
       return { date: record.date, reasons, record };
@@ -90,12 +82,6 @@ export const buildDoctorSummary = (
     averageActivityScore: averageIgnoringNull(periodRecords.map((record) => record.activityScore)),
     lowActivityDays: countLowActivityDays(periodRecords),
     badConditionDays: countBadConditionDays(periodRecords),
-    averageSleepHours: averageIgnoringNull(periodRecords.map((record) => record.health.sleepHours)),
-    shortSleepDays: countShortSleepDays(periodRecords),
-    averageRestingHeartRate: averageIgnoringNull(
-      periodRecords.map((record) => record.health.restingHeartRate)
-    ),
-    averageSteps: averageIgnoringNull(periodRecords.map((record) => record.health.steps)),
     memoDays: periodRecords.filter((record) => record.memo.trim()).length,
     notableDays: getNotableDays(periodRecords),
     visitMemo: visitCycle.visitMemo

@@ -1,7 +1,5 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Line,
   LineChart,
@@ -20,8 +18,8 @@ import {
 } from "./analytics";
 import { addDays, daysBetween, formatJapaneseDate, formatShortDate, todayString } from "./dateUtils";
 import { createDailyRecord, createEmptyAppData, TIME_SLOTS } from "./defaults";
-import { loadAppData, normalizeAppData, normalizeNumberOrNull, saveAppData } from "./storage";
-import type { AppData, Condition, DailyRecord, HealthMetrics, VisitCycle } from "./types";
+import { loadAppData, normalizeAppData, saveAppData } from "./storage";
+import type { AppData, Condition, DailyRecord, VisitCycle } from "./types";
 
 type TabKey = "today" | "period" | "visit" | "settings";
 type SaveState = "読み込み中" | "保存済み" | "保存中" | "保存エラー";
@@ -64,11 +62,6 @@ const formatDaysUntil = (nextVisitDate: string | null): string => {
   if (difference < 0) return "更新してください";
   if (difference === 0) return "今日";
   return `あと${difference}日`;
-};
-
-const parseInputNumber = (value: string): number | null => {
-  if (value.trim() === "") return null;
-  return normalizeNumberOrNull(value);
 };
 
 const getRecordByDate = (records: DailyRecord[], date: string): DailyRecord | null =>
@@ -161,10 +154,7 @@ function App() {
         date,
         label: formatShortDate(date),
         activityScore: record?.activityScore ?? null,
-        sleepHours: record?.health.sleepHours ?? null,
-        restingHeartRate: record?.health.restingHeartRate ?? null,
-        medicationAdherence: record ? calculateDailyMedicationAdherence(record) : null,
-        steps: record?.health.steps ?? null
+        medicationAdherence: record ? calculateDailyMedicationAdherence(record) : null
       };
     });
   }, [data, periodRecords]);
@@ -246,16 +236,6 @@ function TodayTab({
   currentDate: string;
 }) {
   const medicationRate = calculateDailyMedicationAdherence(record);
-
-  const updateHealth = (key: keyof HealthMetrics, value: number | null) => {
-    updateRecord((previous) => ({
-      ...previous,
-      health: {
-        ...previous.health,
-        [key]: value
-      }
-    }));
-  };
 
   return (
     <div className="screen-stack">
@@ -362,43 +342,6 @@ function TodayTab({
       </section>
 
       <section className="card">
-        <div className="section-heading">
-          <h2>測定データ</h2>
-          <p>睡眠、心拍数、歩数を必要な日だけ手入力します。未入力は0にしません。</p>
-        </div>
-        <div className="input-grid">
-          <NumberField
-            label="睡眠時間（時間）"
-            value={record.health.sleepHours}
-            inputMode="decimal"
-            placeholder="例 6.5"
-            onChange={(value) => updateHealth("sleepHours", value)}
-          />
-          <NumberField
-            label="安静時心拍数（bpm）"
-            value={record.health.restingHeartRate}
-            inputMode="numeric"
-            placeholder="例 62"
-            onChange={(value) => updateHealth("restingHeartRate", value)}
-          />
-          <NumberField
-            label="平均心拍数（bpm）"
-            value={record.health.averageHeartRate}
-            inputMode="numeric"
-            placeholder="例 81"
-            onChange={(value) => updateHealth("averageHeartRate", value)}
-          />
-          <NumberField
-            label="歩数"
-            value={record.health.steps}
-            inputMode="numeric"
-            placeholder="例 5400"
-            onChange={(value) => updateHealth("steps", value)}
-          />
-        </div>
-      </section>
-
-      <section className="card">
         <label className="field-label" htmlFor="today-memo">
           メモ
         </label>
@@ -434,21 +377,6 @@ function PeriodTab({
       detail: `3以下 ${summary.lowActivityDays}日`
     },
     { label: "体調「悪い」", value: `${summary.badConditionDays}日`, detail: "本人入力ベース" },
-    {
-      label: "平均睡眠時間",
-      value: formatNullableNumber(summary.averageSleepHours, "時間", 1, "記録なし"),
-      detail: `6時間未満 ${summary.shortSleepDays}日`
-    },
-    {
-      label: "平均安静時心拍数",
-      value: formatNullableNumber(summary.averageRestingHeartRate, "bpm", 0, "記録なし"),
-      detail: "未入力は除外"
-    },
-    {
-      label: "平均歩数",
-      value: formatNullableNumber(summary.averageSteps, "歩", 0, "記録なし"),
-      detail: "未入力は除外"
-    },
     { label: "メモあり", value: `${summary.memoDays}日`, detail: "相談候補の目印" }
   ];
 
@@ -490,37 +418,12 @@ function PeriodTab({
         color="#2563eb"
       />
       <ChartCard
-        title="睡眠時間の推移"
-        data={chartData}
-        dataKey="sleepHours"
-        domain={[0, 12]}
-        suffix="時間"
-        color="#7c3aed"
-      />
-      <ChartCard
-        title="安静時心拍数の推移"
-        data={chartData}
-        dataKey="restingHeartRate"
-        domain={["dataMin - 5", "dataMax + 5"]}
-        suffix="bpm"
-        color="#db2777"
-      />
-      <ChartCard
         title="服薬達成率の推移"
         data={chartData}
         dataKey="medicationAdherence"
         domain={[0, 100]}
         suffix="%"
         color="#0f766e"
-      />
-      <ChartCard
-        title="歩数の推移"
-        data={chartData}
-        dataKey="steps"
-        domain={[0, "dataMax + 1000"]}
-        suffix="歩"
-        color="#f97316"
-        asBar
       />
     </div>
   );
@@ -638,18 +541,6 @@ function VisitTab({
               <div>
                 <dt>体調「悪い」</dt>
                 <dd>{summary.badConditionDays}日</dd>
-              </div>
-              <div>
-                <dt>平均睡眠時間</dt>
-                <dd>{formatNullableNumber(summary.averageSleepHours, "時間", 1, "記録なし")}</dd>
-              </div>
-              <div>
-                <dt>睡眠6時間未満</dt>
-                <dd>{summary.shortSleepDays}日</dd>
-              </div>
-              <div>
-                <dt>平均安静時心拍数</dt>
-                <dd>{formatNullableNumber(summary.averageRestingHeartRate, "bpm", 0, "記録なし")}</dd>
               </div>
               <div>
                 <dt>メモあり</dt>
@@ -774,40 +665,9 @@ function SettingsTab({
         <p>
           このWebアプリは診察時の説明補助を目的とした記録ツールです。診断や治療方針の決定は医師の判断に従ってください。
         </p>
-        <p>
-          睡眠時間、心拍数、歩数は、必要な日だけ手入力してください。
-        </p>
         <p>未入力やデータなしは0として扱いません。</p>
       </section>
     </div>
-  );
-}
-
-function NumberField({
-  label,
-  value,
-  onChange,
-  inputMode,
-  placeholder
-}: {
-  label: string;
-  value: number | null | undefined;
-  onChange: (value: number | null) => void;
-  inputMode: "numeric" | "decimal";
-  placeholder: string;
-}) {
-  return (
-    <label className="field">
-      <span>{label}</span>
-      <input
-        type="text"
-        inputMode={inputMode}
-        pattern={inputMode === "decimal" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
-        value={value ?? ""}
-        placeholder={placeholder}
-        onChange={(event) => onChange(parseInputNumber(event.target.value))}
-      />
-    </label>
   );
 }
 
@@ -834,8 +694,7 @@ function ChartCard({
   dataKey,
   domain,
   suffix,
-  color,
-  asBar = false
+  color
 }: {
   title: string;
   data: Array<Record<string, string | number | null>>;
@@ -843,7 +702,6 @@ function ChartCard({
   domain: [number | string, number | string];
   suffix: string;
   color: string;
-  asBar?: boolean;
 }) {
   const availableValues = data.map((item) => item[dataKey] as number | null);
   const average = averageIgnoringNull(availableValues);
@@ -862,31 +720,21 @@ function ChartCard({
           <div className="empty-chart">受診期間を設定するとグラフを表示します。</div>
         ) : (
           <ResponsiveContainer width="100%" height={220}>
-            {asBar ? (
-              <BarChart data={data} margin={{ top: 10, right: 6, bottom: 0, left: -24 }}>
-                <CartesianGrid stroke="#cbd5e1" vertical={false} />
-                <XAxis dataKey="label" stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} interval={6} />
-                <YAxis stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} domain={domain} />
-                <Tooltip content={<ChartTooltip suffix={suffix} />} />
-                <Bar dataKey={dataKey} fill={color} radius={[6, 6, 0, 0]} />
-              </BarChart>
-            ) : (
-              <LineChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -24 }}>
-                <CartesianGrid stroke="#cbd5e1" vertical={false} />
-                <XAxis dataKey="label" stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} interval={6} />
-                <YAxis stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} domain={domain} />
-                <Tooltip content={<ChartTooltip suffix={suffix} />} />
-                <Line
-                  type="monotone"
-                  dataKey={dataKey}
-                  stroke={color}
-                  strokeWidth={3}
-                  dot={{ r: 3 }}
-                  activeDot={{ r: 5 }}
-                  connectNulls={false}
-                />
-              </LineChart>
-            )}
+            <LineChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -24 }}>
+              <CartesianGrid stroke="#cbd5e1" vertical={false} />
+              <XAxis dataKey="label" stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} interval={6} />
+              <YAxis stroke="#334155" tick={{ fontSize: 11, fontWeight: 700 }} domain={domain} />
+              <Tooltip content={<ChartTooltip suffix={suffix} />} />
+              <Line
+                type="monotone"
+                dataKey={dataKey}
+                stroke={color}
+                strokeWidth={3}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
+                connectNulls={false}
+              />
+            </LineChart>
           </ResponsiveContainer>
         )}
       </div>

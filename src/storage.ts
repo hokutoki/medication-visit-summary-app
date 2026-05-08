@@ -1,5 +1,5 @@
 import { createDailyRecord, createDefaultMedications, createEmptyAppData, TIME_SLOTS } from "./defaults";
-import type { AppData, DailyRecord, HealthMetrics, MedicationLog, TimeSlot } from "./types";
+import type { AppData, DailyRecord, MedicationLog, TimeSlot } from "./types";
 
 const DB_NAME = "medication-visit-summary";
 const STORE_NAME = "app";
@@ -68,16 +68,6 @@ const normalizeMedicationLogs = (logs: unknown): MedicationLog[] => {
   });
 };
 
-const normalizeHealth = (health: unknown): HealthMetrics => {
-  const raw = typeof health === "object" && health !== null ? (health as HealthMetrics) : {};
-  return {
-    sleepHours: normalizeNumberOrNull(raw.sleepHours),
-    restingHeartRate: normalizeNumberOrNull(raw.restingHeartRate),
-    averageHeartRate: normalizeNumberOrNull(raw.averageHeartRate),
-    steps: normalizeNumberOrNull(raw.steps)
-  };
-};
-
 export const normalizeDailyRecord = (record: unknown): DailyRecord | null => {
   if (typeof record !== "object" || record === null) return null;
   const raw = record as Partial<DailyRecord>;
@@ -91,7 +81,6 @@ export const normalizeDailyRecord = (record: unknown): DailyRecord | null => {
     condition: raw.condition === "good" || raw.condition === "bad" ? raw.condition : "normal",
     activityScore:
       normalizedActivityScore === null ? null : Math.max(0, Math.min(10, normalizedActivityScore)),
-    health: normalizeHealth(raw.health),
     memo: typeof raw.memo === "string" ? raw.memo : "",
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : new Date().toISOString()
   };

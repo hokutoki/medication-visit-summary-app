@@ -1,7 +1,7 @@
 {
   "name": "服薬と受診サマリー",
   "short_name": "服薬受診",
-  "description": "4週間ごとの通院に向けた服薬・体調・睡眠・心拍・歩数の記録PWA",
+  "description": "4週間ごとの通院に向けた服薬・体調・やる気・メモの記録PWA",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

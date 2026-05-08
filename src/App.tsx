@@ -367,7 +367,6 @@ function PeriodTab({
 }) {
   const period = getVisitPeriod(data.visitCycle);
   const kpis = [
-    { label: "服薬達成率", value: formatPercent(summary.medicationAdherence), detail: `${records.length}日分の記録` },
     {
       label: "平均やる気・動ける度",
       value: formatNullableNumber(summary.averageActivityScore, "/5", 1, "記録なし"),
@@ -377,8 +376,7 @@ function PeriodTab({
       label: "平均体調",
       value: formatNullableNumber(summary.averageConditionScore, "/5", 1, "記録なし"),
       detail: `2以下 ${summary.badConditionDays}日`
-    },
-    { label: "メモあり", value: `${summary.memoDays}日`, detail: "相談候補の目印" }
+    }
   ];
 
   return (

@@ -11,12 +11,12 @@ This app must never claim to diagnose, treat, or determine medical decisions.
 Always present summaries as reference information for doctor visits.
 Display clear disclaimers in the UI.
 
-## HealthKit Rule
+## Measurement Data Rule
 
 This is a web app.
-Do not implement direct HealthKit access in the PWA.
-HealthKit data may be entered manually or imported as JSON.
-Direct HealthKit integration requires a native iOS app using Swift/SwiftUI and HealthKit.
+Do not add automatic sensor integrations to the PWA.
+Sleep, heart rate, and step data are manual-entry fields in this app.
+Keep related UI simple and avoid implying automatic data retrieval.
 
 ## UX Rules
 

@@ -10,7 +10,6 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { mergeHealthKitImport, parseHealthKitImport } from "./healthKitImport";
 import {
   averageIgnoringNull,
   buildChartDates,
@@ -364,8 +363,8 @@ function TodayTab({
 
       <section className="card">
         <div className="section-heading">
-          <h2>HealthKit相当データ</h2>
-          <p>Web版では直接取得せず、手入力またはJSONインポートで扱います。</p>
+          <h2>測定データ</h2>
+          <p>睡眠、心拍数、歩数を必要な日だけ手入力します。未入力は0にしません。</p>
         </div>
         <div className="input-grid">
           <NumberField
@@ -724,27 +723,6 @@ function SettingsTab({
     }
   };
 
-  const importHealthKitJson = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      const parsed = parseHealthKitImport(JSON.parse(await file.text()));
-      const merged = mergeHealthKitImport(data, parsed.records);
-      commitData(() => merged.data);
-      setErrorMessage(null);
-      setImportStatus(
-        `HealthKit JSONから${merged.updatedRecords}日分、${merged.updatedFields}項目を取り込みました。` +
-          (parsed.ignoredRows > 0 ? ` ${parsed.ignoredRows}行は形式不一致のため無視しました。` : "")
-      );
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("HealthKit JSONインポートに失敗しました。dateとhealth項目を含むJSONか確認してください。");
-      setImportStatus(null);
-    } finally {
-      event.target.value = "";
-    }
-  };
-
   const deleteAllData = () => {
     const ok = window.confirm("端末内の全記録を削除します。この操作は取り消せません。続けますか？");
     if (!ok) return;
@@ -777,17 +755,12 @@ function SettingsTab({
             JSONインポート
             <input type="file" accept="application/json,.json" onChange={importJson} />
           </label>
-          <label className="file-button healthkit-button">
-            HealthKit JSONインポート
-            <input type="file" accept="application/json,.json" onChange={importHealthKitJson} />
-          </label>
           <button type="button" className="danger-button" onClick={deleteAllData}>
             全データ削除
           </button>
         </div>
         <p className="settings-note">
-          HealthKit JSONインポートは、日別の睡眠時間・安静時心拍数・平均心拍数・歩数だけを既存記録へマージします。
-          服薬、体調、やる気・動ける度、メモは上書きしません。
+          JSONインポートはアプリ全体のバックアップ復元用です。端末やブラウザを変える前にエクスポートしてください。
         </p>
         {importStatus ? (
           <p className="import-status" role="status">
@@ -802,7 +775,7 @@ function SettingsTab({
           このWebアプリは診察時の説明補助を目的とした記録ツールです。診断や治療方針の決定は医師の判断に従ってください。
         </p>
         <p>
-          HealthKit由来のデータはWebアプリから直接取得できないため、初期版では手入力またはJSONインポートで扱います。
+          睡眠時間、心拍数、歩数は、必要な日だけ手入力してください。
         </p>
         <p>未入力やデータなしは0として扱いません。</p>
       </section>

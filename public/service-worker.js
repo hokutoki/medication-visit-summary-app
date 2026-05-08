@@ -1,4 +1,4 @@
-const CACHE_NAME = "medication-visit-summary-v3";
+const CACHE_NAME = "medication-visit-summary-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,8 +6,7 @@ const APP_SHELL = [
   "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./icons/apple-touch-icon.png",
-  "./examples/healthkit-import-sample.json"
+  "./icons/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {

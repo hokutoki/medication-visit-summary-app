@@ -153,8 +153,7 @@ function App() {
       return {
         date,
         label: formatShortDate(date),
-        activityScore: record?.activityScore ?? null,
-        medicationAdherence: record ? calculateDailyMedicationAdherence(record) : null
+        activityScore: record?.activityScore ?? null
       };
     });
   }, [data, periodRecords]);
@@ -416,14 +415,6 @@ function PeriodTab({
         domain={[0, 10]}
         suffix="/10"
         color="#2563eb"
-      />
-      <ChartCard
-        title="服薬達成率の推移"
-        data={chartData}
-        dataKey="medicationAdherence"
-        domain={[0, 100]}
-        suffix="%"
-        color="#0f766e"
       />
     </div>
   );

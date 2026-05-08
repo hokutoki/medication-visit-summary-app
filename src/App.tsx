@@ -411,20 +411,20 @@ function PeriodTab({
       </section>
 
       <ChartCard
-        title="やる気・動ける度の推移"
-        data={chartData}
-        dataKey="activityScore"
-        domain={[1, 5]}
-        suffix="/5"
-        color="#2563eb"
-      />
-      <ChartCard
         title="体調の推移"
         data={chartData}
         dataKey="conditionScore"
         domain={[1, 5]}
         suffix="/5"
         color="#f97316"
+      />
+      <ChartCard
+        title="やる気・動ける度の推移"
+        data={chartData}
+        dataKey="activityScore"
+        domain={[1, 5]}
+        suffix="/5"
+        color="#2563eb"
       />
     </div>
   );

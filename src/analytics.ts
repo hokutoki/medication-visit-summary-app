@@ -1,5 +1,5 @@
 import { addDays, listDatesInclusive } from "./dateUtils";
-import { getConditionLabel, TIME_SLOTS } from "./defaults";
+import { getActivityLabel, getConditionLabel, TIME_SLOTS } from "./defaults";
 import type { DailyRecord, DoctorSummary, NotableDay, VisitCycle, VisitPeriod } from "./types";
 
 export const getVisitPeriod = (visitCycle: VisitCycle): VisitPeriod | null => {
@@ -49,7 +49,7 @@ export const averageIgnoringNull = (values: Array<number | null | undefined>): n
 };
 
 export const countLowActivityDays = (records: DailyRecord[]): number =>
-  records.filter((record) => record.activityScore !== null && record.activityScore <= 3).length;
+  records.filter((record) => record.activityScore !== null && record.activityScore <= 2).length;
 
 export const countBadConditionDays = (records: DailyRecord[]): number =>
   records.filter((record) => record.condition <= 2).length;
@@ -58,8 +58,8 @@ export const getNotableDays = (records: DailyRecord[]): NotableDay[] =>
   records
     .map((record) => {
       const reasons: string[] = [];
-      if (record.activityScore !== null && record.activityScore <= 3) {
-        reasons.push(`やる気・動ける度 ${record.activityScore}`);
+      if (record.activityScore !== null && record.activityScore <= 2) {
+        reasons.push(`やる気・動ける度 ${record.activityScore}/5（${getActivityLabel(record.activityScore)}）`);
       }
       if (record.condition <= 2) reasons.push(`体調 ${record.condition}/5（${getConditionLabel(record.condition)}）`);
       if (record.medications.some((medication) => !medication.taken)) reasons.push("服薬忘れあり");

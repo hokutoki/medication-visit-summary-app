@@ -1,4 +1,4 @@
-import type { AppData, Condition, DailyRecord, MedicationLog, TimeSlot } from "./types";
+import type { ActivityScore, AppData, Condition, DailyRecord, MedicationLog, TimeSlot } from "./types";
 
 export const CONDITION_OPTIONS: Array<{ id: Condition; label: string; detail: string }> = [
   { id: 1, label: "1", detail: "かなり悪い" },
@@ -10,6 +10,17 @@ export const CONDITION_OPTIONS: Array<{ id: Condition; label: string; detail: st
 
 export const getConditionLabel = (condition: Condition): string =>
   CONDITION_OPTIONS.find((option) => option.id === condition)?.detail ?? "未設定";
+
+export const ACTIVITY_OPTIONS: Array<{ id: ActivityScore; label: string; detail: string }> = [
+  { id: 1, label: "1", detail: "ほぼ動けない" },
+  { id: 2, label: "2", detail: "かなり低い" },
+  { id: 3, label: "3", detail: "普通" },
+  { id: 4, label: "4", detail: "動ける" },
+  { id: 5, label: "5", detail: "よく動ける" }
+];
+
+export const getActivityLabel = (score: ActivityScore): string =>
+  ACTIVITY_OPTIONS.find((option) => option.id === score)?.detail ?? "未設定";
 
 export const TIME_SLOTS: Array<{ id: TimeSlot; label: string; shortLabel: string }> = [
   { id: "wakeConcerta", label: "起床直後･コンサータ", shortLabel: "起" },
@@ -36,7 +47,7 @@ export const createDailyRecord = (date: string): DailyRecord => ({
 });
 
 export const createEmptyAppData = (): AppData => ({
-  version: 1,
+  version: 2,
   visitCycle: {
     previousVisitDate: null,
     nextVisitDate: null,

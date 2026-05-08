@@ -17,7 +17,7 @@ import {
   getVisitPeriod
 } from "./analytics";
 import { addDays, daysBetween, formatJapaneseDate, formatShortDate, todayString } from "./dateUtils";
-import { CONDITION_OPTIONS, createDailyRecord, createEmptyAppData, TIME_SLOTS } from "./defaults";
+import { ACTIVITY_OPTIONS, CONDITION_OPTIONS, createDailyRecord, createEmptyAppData, TIME_SLOTS } from "./defaults";
 import { loadAppData, normalizeAppData, saveAppData } from "./storage";
 import type { AppData, DailyRecord, VisitCycle } from "./types";
 
@@ -292,7 +292,7 @@ function TodayTab({
           <h2>今日の体調</h2>
           <p>1 = かなり悪い / 3 = 普通 / 5 = かなり良い</p>
         </div>
-        <div className="score-grid condition-score-grid" role="group" aria-label="今日の体調">
+        <div className="score-grid five-score-grid" role="group" aria-label="今日の体調">
           {CONDITION_OPTIONS.map((option) => (
             <button
               key={option.id}
@@ -312,18 +312,20 @@ function TodayTab({
       <section className="card">
         <div className="section-heading">
           <h2>やる気・動ける度</h2>
-          <p>0 = ほぼ何もできない / 5 = 普通 / 10 = よく動ける</p>
+          <p>1 = ほぼ動けない / 3 = 普通 / 5 = よく動ける</p>
         </div>
-        <div className="score-grid" role="group" aria-label="やる気・動ける度">
-          {Array.from({ length: 11 }, (_, score) => (
+        <div className="score-grid five-score-grid" role="group" aria-label="やる気・動ける度">
+          {ACTIVITY_OPTIONS.map((option) => (
             <button
-              key={score}
+              key={option.id}
               type="button"
-              className={record.activityScore === score ? "score-button active" : "score-button"}
-              aria-pressed={record.activityScore === score}
-              onClick={() => updateRecord((previous) => ({ ...previous, activityScore: score }))}
+              className={record.activityScore === option.id ? "score-button active" : "score-button"}
+              aria-pressed={record.activityScore === option.id}
+              aria-label={`やる気・動ける度 ${option.id}、${option.detail}`}
+              onClick={() => updateRecord((previous) => ({ ...previous, activityScore: option.id }))}
             >
-              {score}
+              {option.label}
+              <span>{option.detail}</span>
             </button>
           ))}
         </div>
@@ -368,8 +370,8 @@ function PeriodTab({
     { label: "服薬達成率", value: formatPercent(summary.medicationAdherence), detail: `${records.length}日分の記録` },
     {
       label: "平均やる気・動ける度",
-      value: formatNullableNumber(summary.averageActivityScore, "/10", 1, "記録なし"),
-      detail: `3以下 ${summary.lowActivityDays}日`
+      value: formatNullableNumber(summary.averageActivityScore, "/5", 1, "記録なし"),
+      detail: `2以下 ${summary.lowActivityDays}日`
     },
     {
       label: "平均体調",
@@ -412,8 +414,8 @@ function PeriodTab({
         title="やる気・動ける度の推移"
         data={chartData}
         dataKey="activityScore"
-        domain={[0, 10]}
-        suffix="/10"
+        domain={[1, 5]}
+        suffix="/5"
         color="#2563eb"
       />
       <ChartCard
@@ -531,10 +533,10 @@ function VisitTab({
               </div>
               <div>
                 <dt>平均やる気・動ける度</dt>
-                <dd>{formatNullableNumber(summary.averageActivityScore, "/10", 1, "記録なし")}</dd>
+                <dd>{formatNullableNumber(summary.averageActivityScore, "/5", 1, "記録なし")}</dd>
               </div>
               <div>
-                <dt>やる気・動ける度 3以下</dt>
+                <dt>やる気・動ける度 2以下</dt>
                 <dd>{summary.lowActivityDays}日</dd>
               </div>
               <div>

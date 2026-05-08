@@ -1,5 +1,7 @@
 export type Condition = 1 | 2 | 3 | 4 | 5;
 
+export type ActivityScore = 1 | 2 | 3 | 4 | 5;
+
 export type TimeSlot = "wakeConcerta" | "morning" | "lunch" | "evening" | "bedtime";
 
 export type MedicationLog = {
@@ -12,7 +14,7 @@ export type DailyRecord = {
   date: string;
   medications: MedicationLog[];
   condition: Condition;
-  activityScore: number | null;
+  activityScore: ActivityScore | null;
   memo: string;
   updatedAt: string;
 };
@@ -25,7 +27,7 @@ export type VisitCycle = {
 };
 
 export type AppData = {
-  version: 1;
+  version: 2;
   visitCycle: VisitCycle;
   records: DailyRecord[];
 };

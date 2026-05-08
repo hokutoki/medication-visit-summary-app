@@ -1,5 +1,5 @@
 import { createDailyRecord, createDefaultMedications, createEmptyAppData, TIME_SLOTS } from "./defaults";
-import type { AppData, Condition, DailyRecord, MedicationLog, TimeSlot } from "./types";
+import type { ActivityScore, AppData, Condition, DailyRecord, MedicationLog, TimeSlot } from "./types";
 
 const DB_NAME = "medication-visit-summary";
 const STORE_NAME = "app";
@@ -80,19 +80,30 @@ const normalizeCondition = (condition: unknown): Condition => {
   return 3;
 };
 
-export const normalizeDailyRecord = (record: unknown): DailyRecord | null => {
+const normalizeActivityScore = (score: unknown, useLegacyScale: boolean): ActivityScore | null => {
+  const numberValue = normalizeNumberOrNull(score);
+  if (numberValue === null) return null;
+
+  if (useLegacyScale) {
+    const legacyScore = Math.max(0, Math.min(10, numberValue));
+    return Math.max(1, Math.min(5, Math.round((legacyScore / 10) * 4 + 1))) as ActivityScore;
+  }
+
+  return Math.max(1, Math.min(5, Math.round(numberValue))) as ActivityScore;
+};
+
+export const normalizeDailyRecord = (record: unknown, useLegacyActivityScale = false): DailyRecord | null => {
   if (typeof record !== "object" || record === null) return null;
   const raw = record as Partial<DailyRecord> & { condition?: unknown };
   if (typeof raw.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date)) return null;
-  const normalizedActivityScore = normalizeNumberOrNull(raw.activityScore);
+  const normalizedActivityScore = normalizeActivityScore(raw.activityScore, useLegacyActivityScale);
 
   const base = createDailyRecord(raw.date);
   return {
     ...base,
     medications: normalizeMedicationLogs(raw.medications),
     condition: normalizeCondition(raw.condition),
-    activityScore:
-      normalizedActivityScore === null ? null : Math.max(0, Math.min(10, normalizedActivityScore)),
+    activityScore: normalizedActivityScore,
     memo: typeof raw.memo === "string" ? raw.memo : "",
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : new Date().toISOString()
   };
@@ -102,18 +113,19 @@ export const normalizeAppData = (data: unknown): AppData => {
   const empty = createEmptyAppData();
   if (typeof data !== "object" || data === null) return empty;
   const raw = data as Partial<AppData>;
+  const useLegacyActivityScale = raw.version !== 2;
   const rawVisitCycle =
     typeof raw.visitCycle === "object" && raw.visitCycle !== null ? raw.visitCycle : empty.visitCycle;
 
   const records = Array.isArray(raw.records)
     ? raw.records
-        .map(normalizeDailyRecord)
+        .map((record) => normalizeDailyRecord(record, useLegacyActivityScale))
         .filter((record): record is DailyRecord => record !== null)
         .sort((a, b) => a.date.localeCompare(b.date))
     : [];
 
   return {
-    version: 1,
+    version: 2,
     visitCycle: {
       previousVisitDate:
         typeof rawVisitCycle.previousVisitDate === "string" ? rawVisitCycle.previousVisitDate : null,

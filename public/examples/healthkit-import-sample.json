@@ -1,0 +1,25 @@
+{
+  "source": "healthkit-json",
+  "version": 1,
+  "generatedAt": "2026-05-09T00:00:00+09:00",
+  "records": [
+    {
+      "date": "2026-05-08",
+      "health": {
+        "sleepHours": 6.5,
+        "restingHeartRate": 62,
+        "averageHeartRate": 78,
+        "steps": 5400
+      }
+    },
+    {
+      "date": "2026-05-09",
+      "health": {
+        "sleepHours": null,
+        "restingHeartRate": 64,
+        "averageHeartRate": 82,
+        "steps": 6200
+      }
+    }
+  ]
+}

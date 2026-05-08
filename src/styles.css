@@ -381,6 +381,10 @@ textarea {
   color: #ffffff;
 }
 
+.healthkit-button {
+  background: #0f766e;
+}
+
 .secondary-button {
   background: #e0f2fe;
   color: #0c4a6e;
@@ -401,6 +405,23 @@ textarea {
   inset: 0;
   opacity: 0;
   cursor: pointer;
+}
+
+.settings-note {
+  margin: 14px 0 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.import-status {
+  margin: 14px 0 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  border: 2px solid #34d399;
+  color: #14532d;
+  font-weight: 800;
+  line-height: 1.55;
 }
 
 .kpi-grid {

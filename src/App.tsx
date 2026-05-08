@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
+import { mergeHealthKitImport, parseHealthKitImport } from "./healthKitImport";
 import {
   averageIgnoringNull,
   buildChartDates,
@@ -694,6 +695,8 @@ function SettingsTab({
   commitData: (updater: (previous: AppData) => AppData) => void;
   setErrorMessage: (message: string | null) => void;
 }) {
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+
   const exportJson = () => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -711,9 +714,32 @@ function SettingsTab({
       const importedData = normalizeAppData(JSON.parse(await file.text()));
       commitData(() => importedData);
       setErrorMessage(null);
+      setImportStatus("アプリ全体のJSONデータをインポートしました。");
     } catch (error) {
       console.error(error);
       setErrorMessage("JSONインポートに失敗しました。ファイル形式を確認してください。");
+      setImportStatus(null);
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const importHealthKitJson = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const parsed = parseHealthKitImport(JSON.parse(await file.text()));
+      const merged = mergeHealthKitImport(data, parsed.records);
+      commitData(() => merged.data);
+      setErrorMessage(null);
+      setImportStatus(
+        `HealthKit JSONから${merged.updatedRecords}日分、${merged.updatedFields}項目を取り込みました。` +
+          (parsed.ignoredRows > 0 ? ` ${parsed.ignoredRows}行は形式不一致のため無視しました。` : "")
+      );
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("HealthKit JSONインポートに失敗しました。dateとhealth項目を含むJSONか確認してください。");
+      setImportStatus(null);
     } finally {
       event.target.value = "";
     }
@@ -751,10 +777,23 @@ function SettingsTab({
             JSONインポート
             <input type="file" accept="application/json,.json" onChange={importJson} />
           </label>
+          <label className="file-button healthkit-button">
+            HealthKit JSONインポート
+            <input type="file" accept="application/json,.json" onChange={importHealthKitJson} />
+          </label>
           <button type="button" className="danger-button" onClick={deleteAllData}>
             全データ削除
           </button>
         </div>
+        <p className="settings-note">
+          HealthKit JSONインポートは、日別の睡眠時間・安静時心拍数・平均心拍数・歩数だけを既存記録へマージします。
+          服薬、体調、やる気・動ける度、メモは上書きしません。
+        </p>
+        {importStatus ? (
+          <p className="import-status" role="status">
+            {importStatus}
+          </p>
+        ) : null}
       </section>
 
       <section className="notice medical-notice">

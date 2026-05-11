@@ -37,12 +37,6 @@ export type VisitPeriod = {
   endDate: string;
 };
 
-export type NotableDay = {
-  date: string;
-  reasons: string[];
-  record: DailyRecord;
-};
-
 export type DoctorSummary = {
   period: VisitPeriod | null;
   averageActivityScore: number | null;
@@ -50,6 +44,5 @@ export type DoctorSummary = {
   lowActivityDays: number;
   badConditionDays: number;
   memoDays: number;
-  notableDays: NotableDay[];
   visitMemo: string;
 };

@@ -576,41 +576,13 @@ textarea {
   font-weight: 900;
 }
 
-.notable-section,
 .doctor-note {
   margin-top: 18px;
 }
 
-.notable-section h3,
 .doctor-note h3 {
   margin: 0 0 10px;
   font-size: 1rem;
-}
-
-.notable-list {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.notable-list li {
-  display: grid;
-  gap: 5px;
-  padding: 12px;
-  border-radius: 12px;
-  background: #fff7ed;
-  border: 2px solid #fed7aa;
-}
-
-.notable-list span {
-  color: #7c2d12;
-}
-
-.notable-list small {
-  color: #475569;
-  line-height: 1.5;
 }
 
 .doctor-note p {

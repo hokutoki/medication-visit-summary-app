@@ -547,23 +547,6 @@ function VisitTab({
               </div>
             </dl>
 
-            <div className="notable-section">
-              <h3>気になった日</h3>
-              {summary.notableDays.length === 0 ? (
-                <p className="muted">条件に該当する日はまだありません。</p>
-              ) : (
-                <ul className="notable-list">
-                  {summary.notableDays.map((day) => (
-                    <li key={day.date}>
-                      <strong>{day.date}</strong>
-                      <span>{day.reasons.join("、")}</span>
-                      {day.record.memo.trim() ? <small>{day.record.memo.trim()}</small> : null}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
             <div className="doctor-note">
               <h3>診察メモ</h3>
               <p>{summary.visitMemo.trim() || "未入力"}</p>

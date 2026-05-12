@@ -576,25 +576,6 @@ textarea {
   font-weight: 900;
 }
 
-.doctor-note {
-  margin-top: 18px;
-}
-
-.doctor-note h3 {
-  margin: 0 0 10px;
-  font-size: 1rem;
-}
-
-.doctor-note p {
-  margin: 0;
-  padding: 12px;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #0f172a;
-  border: 2px solid #bfdbfe;
-  line-height: 1.55;
-}
-
 .bottom-tabs {
   position: fixed;
   right: 0;

@@ -539,11 +539,6 @@ function VisitTab({
                 <dd>{summary.memoDays}日</dd>
               </div>
             </dl>
-
-            <div className="doctor-note">
-              <h3>診察メモ</h3>
-              <p>{summary.visitMemo.trim() || "未入力"}</p>
-            </div>
           </>
         )}
       </section>

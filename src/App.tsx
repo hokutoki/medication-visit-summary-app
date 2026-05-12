@@ -492,16 +492,6 @@ function VisitTab({
         >
           今日から4週間後の診察として設定する
         </button>
-        <label className="field-label" htmlFor="visit-memo">
-          診察メモ
-        </label>
-        <textarea
-          id="visit-memo"
-          value={visitCycle.visitMemo}
-          rows={5}
-          placeholder="診察で相談したいこと、薬の相談、生活上の困りごとなど"
-          onChange={(event) => updateVisitCycle({ visitMemo: event.target.value })}
-        />
       </section>
 
       <section className="card summary-card">
@@ -539,6 +529,17 @@ function VisitTab({
                 <dd>{summary.memoDays}日</dd>
               </div>
             </dl>
+            <label className="field-label" htmlFor="visit-memo">
+              自由メモ
+            </label>
+            <textarea
+              id="visit-memo"
+              className="visit-memo-area"
+              value={visitCycle.visitMemo}
+              rows={10}
+              placeholder="診察で相談したいこと、聞きたいこと、伝えたいことなどを自由に記入"
+              onChange={(event) => updateVisitCycle({ visitMemo: event.target.value })}
+            />
           </>
         )}
       </section>

@@ -329,13 +329,6 @@ function TodayTab({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => updateRecord((previous) => ({ ...previous, activityScore: null }))}
-        >
-          やる気・動ける度を未入力に戻す
-        </button>
       </section>
 
       <section className="card">

@@ -558,14 +558,18 @@ function SettingsTab({
 }) {
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
-  const exportJson = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const downloadJson = (payload: AppData, fileName: string) => {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `medication-summary-${todayString()}.json`;
+    anchor.download = fileName;
     anchor.click();
     URL.revokeObjectURL(url);
+  };
+
+  const exportJson = () => {
+    downloadJson(data, `medication-summary-${todayString()}.json`);
   };
 
   const importJson = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -573,9 +577,17 @@ function SettingsTab({
     if (!file) return;
     try {
       const importedData = normalizeAppData(JSON.parse(await file.text()));
+      const ok = window.confirm(
+        "現在の端末内データをバックアップJSONとしてダウンロードしてから、インポートしたJSONでアプリ全体を置き換えます。続けますか？"
+      );
+      if (!ok) {
+        setImportStatus("JSONインポートをキャンセルしました。");
+        return;
+      }
+      downloadJson(data, `medication-summary-before-import-${todayString()}.json`);
       commitData(() => importedData);
       setErrorMessage(null);
-      setImportStatus("アプリ全体のJSONデータをインポートしました。");
+      setImportStatus("バックアップJSONをダウンロードしてから、アプリ全体のJSONデータをインポートしました。");
     } catch (error) {
       console.error(error);
       setErrorMessage("JSONインポートに失敗しました。ファイル形式を確認してください。");
@@ -622,7 +634,7 @@ function SettingsTab({
           </button>
         </div>
         <p className="settings-note">
-          JSONインポートはアプリ全体のバックアップ復元用です。端末やブラウザを変える前にエクスポートしてください。
+          JSONインポートはアプリ全体のバックアップ復元用です。インポート前に現在のデータを自動でJSON保存します。
         </p>
         {importStatus ? (
           <p className="import-status" role="status">
